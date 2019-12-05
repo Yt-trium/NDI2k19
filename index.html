@@ -32,22 +32,54 @@
   </head>
   <body>
     
-    <!-- 1 -->
-    <p id="phase1" class="big_title animated fadeInDown">
+    <div style="display: none;">
+      </div>
+
+    <div id="phase1" class="phase">
+    <p class="big_title animated fadeInDown">
       <b>Bienvenue</b><br/><span class="animated fadeInLeft delay-1s">Nous sommes là pour <u>aider</u>.</span>
       <br/><button id="imStudent" type="button" class="big_button btn btn-outline-light animated jackInTheBox delay-2s">Je suis étudiant·e</button>
     </p>
+    </div>
     <img class="animated fadeInUp ndi_logo" src="img/logo_n2i_color_title_2019.svg"/>
     
-    <!-- 2 -->
-    <p id="phase2" style="display: none" class="big_title right">
+    <div id="phase2" class="phase" style="display: none;">
+    <p class="big_title right">
         Notre application a besoin <br/>d'accéder à votre caméra.
         <br/>
         <button style="display: none" id="startButton" type="button" class="big_button btn btn-outline-light">Démarrer l'expérience</button>
     </p>
+    </div>
+    
+    <div id="phase3" class="phase" style="display: none">
+      <p style="display: block" id="age" class="big-number">23</p>
+      <p style="display: block" class="big-number-desc">Age</p>
+      <button id="age-plus" class="btn big-number-plus">+</button>
+      <button id="age-minus" class="btn big-number-minus">-</button>
+      <button id="phase-3-to-4" class="btn next-phase">></button>
+    </div>
 
-    <video id="video" style="-moz-transform:scaleX(-1);-o-transform:scaleX(-1);-webkit-transform:scaleX(-1);transform:scaleX(-1);display:none"></video>
-    <canvas id="output"></canvas>
+
+    <div id="phase4" class="phase" style="display:none">
+    <p style="display: block" class="big-number"><span id="revenus" class="">0</span>€</p>
+    <p style="display: block" class="big-number-desc">Revenus</p>
+    <button id="revenus-plus" class="btn big-number-plus">+</button>
+    <button id="revenus-minus" class="btn big-number-minus">-</button>
+    <button id="phase-4-to-5" class="btn next-phase">></button>
+  </div>
+
+
+    <div id="phase5" class="phase" style="display:none">
+    <p style="display: block" class="big-number"><span id="loyer" class="">0</span>€</p>
+    <p style="display: block" class="big-number-desc">Loyer</p>
+    <button id="loyer-plus" class="btn big-number-plus">+</button>
+    <button id="loyer-minus" class="btn big-number-minus">-</button>
+    <button id="phase-5-to-6" class="btn next-phase">></button>
+  </div>
+  
+
+  <video id="video" style="-moz-transform:scaleX(-1);-o-transform:scaleX(-1);-webkit-transform:scaleX(-1);transform:scaleX(-1);display:none"></video>
+    <canvas id="output" style="display:none"></canvas>
       
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>

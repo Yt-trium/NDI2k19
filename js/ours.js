@@ -1,14 +1,48 @@
 window.addEventListener("load", function() {
 
+function animateCSS(node, animationName, callback) {
+    node.classList.add('animated', animationName)
+
+    function handleAnimationEnd() {
+        node.classList.remove('animated', animationName)
+        node.removeEventListener('animationend', handleAnimationEnd)
+
+        if (typeof callback === 'function') callback()
+    }
+
+    node.addEventListener('animationend', handleAnimationEnd)
+}
+
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
 const videoWidth = 200;
 const videoHeight = 200;
 
+let data = {
+    age : 23,
+    revenus : 0,
+    loyer: 0
+};
+
 var phase1 = this.document.getElementById("phase1");
 var phase2 = this.document.getElementById("phase2");
+var phase3 = this.document.getElementById("phase3");
+var phase4 = this.document.getElementById("phase4");
+var phase5 = this.document.getElementById("phase5");
+var phase3To4 = this.document.getElementById("phase-3-to-4");
+var phase4To5 = this.document.getElementById("phase-4-to-5");
+var phase5To6 = this.document.getElementById("phase-5-to-6");
 var imStudentButton = this.document.getElementById("imStudent");
 var startButton = this.document.getElementById("startButton");
+var plusAge = this.document.getElementById("age-plus");
+var minusAge = this.document.getElementById("age-minus");
+var age = this.document.getElementById("age");
+var plusRevenus = this.document.getElementById("revenus-plus");
+var minusRevenus = this.document.getElementById("revenus-minus");
+var revenus = this.document.getElementById("revenus");
+var plusLoyer = this.document.getElementById("loyer-plus");
+var minusLoyer = this.document.getElementById("loyer-minus");
+var loyer = this.document.getElementById("loyer");
 
 const COLOR = 'aqua';
 
@@ -133,22 +167,86 @@ let video;
 async function askVideo()
 {
     video = await loadVideo();
-    startButton.style.display = "block";
-    startButton.classList.add("animated", "fadeIn");
+    startButton.style.display = "inline";
+    animateCSS(startButton, "fadeIn");
+}
+
+phase3To4.onclick = function() {
+    animateCSS(phase3, "fadeOutLeft", function() {
+        phase3.style.display = "none";
+        phase4.style.display = "block";
+        animateCSS(phase4, "fadeInRight");
+    })
+}
+
+phase4To5.onclick = function() {
+    animateCSS(phase4, "fadeOutLeft", function() {
+        phase4.style.display = "none";
+        phase5.style.display = "block";
+        animateCSS(phase5, "fadeInRight");
+    })
+}
+
+plusRevenus.onclick = function() {
+    data.revenus = parseInt(revenus.innerHTML) + 100;
+    revenus.innerHTML = data.revenus;
+    revenus.classList.remove("animated", "pulse")
+    revenus.classList.add("animated", "pulse")
+}
+
+minusRevenus.onclick = function() {
+    data.revenus = Math.max(0, parseInt(revenus.innerHTML) - 100);
+    revenus.innerHTML = data.revenus;
+    revenus.classList.remove("animated", "pulse")
+    revenus.classList.add("animated", "pulse")
+}
+
+plusLoyer.onclick = function() {
+    data.loyer = parseInt(loyer.innerHTML) + 100;
+    loyer.innerHTML = data.loyer;
+    loyer.classList.remove("animated", "pulse")
+    loyer.classList.add("animated", "pulse")
+}
+
+minusLoyer.onclick = function() {
+    data.loyer = Math.max(0, parseInt(loyer.innerHTML) - 100);
+    loyer.innerHTML = data.loyer;
+    loyer.classList.remove("animated", "pulse")
+    loyer.classList.add("animated", "pulse")
+}
+
+plusAge.onclick = function() {
+    data.age = parseInt(age.innerHTML) + 1;
+    age.innerHTML = data.age;
+    age.classList.remove("animated", "pulse")
+    age.classList.add("animated", "pulse")
+}
+
+minusAge.onclick = function() {
+    data.age = Math.max(0, parseInt(age.innerHTML) - 1);
+    age.innerHTML = data.age;
+    age.classList.remove("animated", "pulse")
+    age.classList.add("animated", "pulse")
 }
 
 imStudentButton.onclick = function() {
-    phase1.classList.add("animated", "fadeOutLeft");
-    phase2.style.display = "block";
-    phase2.classList.add("animated", "bounceIn", "delay-1s");
-
-    askVideo();
+    animateCSS(phase1, "fadeOutLeft", function() {
+        phase1.style.display = "none";
+        phase2.style.display = "block";
+        animateCSS(phase2, "fadeIn", function() {
+            askVideo();
+        });
+    });
 };
 
 startButton.onclick = function() {
-    phase2.classList.add("animated", "fadeOutLeft");
+    animateCSS(phase2, "fadeOutLeft", function() {
+        phase2.style.display = "none";
+        phase3.style.display = "block";
+        animateCSS(phase3, "fadeInRight");
+    })
 
-    startRender(video);
+    //startRender(video);
 }
 
 }, false);
