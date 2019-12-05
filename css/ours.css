@@ -15,10 +15,10 @@ body {
     font-size: 4em;
     position: absolute;
     left: 20%;
-    top: 30%;
+    top: 20%;
 }
 
 .big_button {
     margin-top: 1em;
-    font-size: 1em;
+    font-size: 0.8em;
 }
