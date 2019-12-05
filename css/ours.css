@@ -1,0 +1,24 @@
+.ndi_logo
+{
+    position: absolute;
+    bottom: 3em;
+    right: 3em;
+}
+
+body {
+    background: #353435;
+    color: #f4ecec;
+    font-family: 'Roboto', sans-serif;
+}
+
+.big_title {
+    font-size: 4em;
+    position: absolute;
+    left: 20%;
+    top: 30%;
+}
+
+.big_button {
+    margin-top: 1em;
+    font-size: 1em;
+}
