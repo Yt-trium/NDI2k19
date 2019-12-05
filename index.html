@@ -13,11 +13,20 @@
     <title>Strasboug aime ses étudiants</title>
   </head>
   <body>
-    <p class="big_title animated fadeInDown">
+    <!-- 1 -->
+    <p id="phase1" class="big_title animated fadeInDown">
         <b>Bienvenue</b><br/><span class="animated fadeInLeft delay-1s">Nous sommes là pour <u>aider</u>.</span>
-        <br/><button type="button" class="big_button btn btn-outline-light animated jackInTheBox delay-2s">Je suis étudiant·e</button>
+        <br/><button id="imStudent" type="button" class="big_button btn btn-outline-light animated jackInTheBox delay-2s">Je suis étudiant·e</button>
       </p>
     <img class="animated fadeInUp ndi_logo" src="img/logo_n2i_color_title_2019.svg"/>
+
+    <!-- 2 -->
+    <p id="phase2" style="display: none" class="big_title right">
+        Notre application a besoin <br/>d'accéder à votre caméra.
+        <br/>
+        <button style="display: none" id="startButton" type="button" class="big_button btn btn-outline-light">Démarrer l'expérience</button>
+    </p>
+    <video id="firstCamera"></video>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
