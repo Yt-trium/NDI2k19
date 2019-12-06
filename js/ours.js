@@ -68,25 +68,6 @@ var social = this.document.getElementById("social");
 
 const COLOR = 'aqua';
 
-async function goAR()
-{
-
-    navigator.mediaDevices.getUserMedia({video : true})
-    .then(function(stream) {
-        video.classList.add("animated", "fadeInUp");
-        video.srcObject = stream;
-        video.onloadedmetadata = function(e) {
-            video.play();
-            startButton.style.display = "block";
-            startButton.classList.add("animated", "fadeIn");
-            startRenderer();
-        };
-    })
-    .catch(function(err) {
-        console.error(err);
-    });
-};
-
 async function setupCamera()
 {
     const video = document.getElementById('video');
@@ -137,11 +118,13 @@ function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
   }
 }
 
+let firstPose = true;
+let keypoints;
 
-async function startRender(video)
+async function startFaceDection(video)
 {
-    const canvas = document.getElementById('output');
-    const ctx = canvas.getContext('2d');
+    //const canvas = document.getElementById('output');
+    //const ctx = canvas.getContext('2d');
 
     const net = await posenet.load({
         architecture: 'MobileNetV1',
@@ -151,20 +134,24 @@ async function startRender(video)
     });
 
 
-    canvas.width = videoWidth;
-    canvas.height = videoHeight;
-
+    //canvas.width = videoWidth;
+    //canvas.height = videoHeight;
 
     async function frame() {
-        let poses = [];
-
         const pose = await net.estimatePoses(video, {
           flipHorizontal: true,
           decodingMethod: 'single-person'
         });
 
-        poses = poses.concat(pose);
+        keypoints = pose[0].keypoints;
 
+        if (firstPose)
+        {
+            firstPose = false;
+            startAnimation();
+        }
+        
+        /*
         ctx.clearRect(0, 0, videoWidth, videoHeight);
         ctx.save();
         ctx.scale(-1, 1);
@@ -172,11 +159,13 @@ async function startRender(video)
         ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
         ctx.restore();
 
-         poses.forEach(({score, keypoints}) => {
+
+         pose.forEach(({score, keypoints}) => {
             if (score >= 0.1) {
                 drawKeypoints(keypoints, 0.5, ctx);
             }
          });
+         */
 
         requestAnimationFrame(frame);
     };
@@ -329,6 +318,89 @@ imStudentButton.onclick = function() {
     });
 };
 
+
+// THEE . JS PART.
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x353435);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000.0);
+camera.position.set(0, 0, 2);
+const renderer = new THREE.WebGLRenderer();
+renderer.domElement.className = "threejs";
+renderer.domElement.style.display = "none";
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+
+//let orbit_controls = new THREE.OrbitControls(camera, renderer.domElement)
+//orbit_controls.enablePan = false;
+//orbit_controls.update();
+//orbit_controls.addEventListener('change', render);
+
+let ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
+scene.add(ambientLight);
+var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+scene.add(directionalLight);
+
+var loader = new THREE.OBJLoader();
+let mask;
+loader.load(
+    '../obj/male_crop_head.obj',
+    function ( object ) {
+        mask = object;
+        scene.add( object );
+        mask.children[0].material.wireframe = true;
+        mask.children[0].material.transparent = true;
+        mask.children[0].material.opacity = 0.3;
+    },
+    function ( xhr ) {
+        console.log("OBJ Progress: ", ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    },
+    function ( error ) {
+        console.error( 'An error happened', error );
+    }
+    );
+
+
+function render()
+{
+    renderer.render( scene, camera );
+
+}
+
+function startAnimation() {
+    animate();
+    renderer.domElement.style.display = "block";
+    animateCSS(renderer.domElement, "fadeIn");
+}
+
+function animate()
+{
+    let nose = keypoints[0].position;
+    let leftEye = keypoints[1].position;
+    let rightEye = keypoints[2].position;
+
+    let nosex = (nose.x / videoWidth) * 1.0 - 0.5;
+    let nosey = (nose.y / videoWidth) * 1.0 - 0.5;
+
+    let leftEyeX = (leftEye.x / videoWidth) * 1.0 - 0.5;
+    let rightEyeX = (rightEye.x / videoWidth) * 1.0 - 0.5;
+
+    let headYRotation = (leftEyeX / nosex) / (rightEyeX / nosex) * 0.02;
+
+    mask.position.x = 1.0 + nosex;
+    mask.position.y = nosey;
+
+    mask.rotation.set(0.0, -20.0 + headYRotation, 0.0);
+    mask.scale.set(1.5, 1.5, 1.5);
+
+
+    render();
+
+    requestAnimationFrame(animate);
+}
+
+// START 3D
+
 startButton.onclick = function() {
     animateCSS(phase2, "fadeOutLeft", function() {
         phase2.style.display = "none";
@@ -336,7 +408,7 @@ startButton.onclick = function() {
         animateCSS(phase3, "fadeInRight");
     })
 
-    //startRender(video);
+    startFaceDection(video);
 }
 
 }, false);
