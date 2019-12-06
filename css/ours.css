@@ -130,3 +130,19 @@ z-index: 20;
     left: 0;
     box-shadow: 0px 0px 40px rgb(0, 0, 0);
 }
+
+#phase9{
+    display: block;
+
+max-width: 1200px;
+
+margin: auto em;
+
+margin-top: 5em;
+
+margin-left: 5em;
+
+font-size: 1.5em;
+
+font-weight: 200;
+}

@@ -18,11 +18,16 @@ navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia 
 const videoWidth = 200;
 const videoHeight = 200;
 
+const school_quality = ["Très mal", "Mal", "Bien", "Très bien"];
+const social_quality = ["Très mal", "Mal", "Bien", "Très bien"];
+
 let data = {
     age : 23,
     revenus : 0,
     loyer: 0,
-    distance: 10
+    distance: 10,
+    school: 2,
+    social: 2
 };
 
 var phase1 = this.document.getElementById("phase1");
@@ -31,9 +36,15 @@ var phase3 = this.document.getElementById("phase3");
 var phase4 = this.document.getElementById("phase4");
 var phase5 = this.document.getElementById("phase5");
 var phase6 = this.document.getElementById("phase6");
+var phase7 = this.document.getElementById("phase7");
+var phase8 = this.document.getElementById("phase8");
+var phase9 = this.document.getElementById("phase9");
 var phase3To4 = this.document.getElementById("phase-3-to-4");
 var phase4To5 = this.document.getElementById("phase-4-to-5");
 var phase5To6 = this.document.getElementById("phase-5-to-6");
+var phase6To7 = this.document.getElementById("phase-6-to-7");
+var phase7to8 = this.document.getElementById("phase-7-to-8");
+var phase8to9 = this.document.getElementById("phase-8-to-9");
 var imStudentButton = this.document.getElementById("imStudent");
 var startButton = this.document.getElementById("startButton");
 var plusAge = this.document.getElementById("age-plus");
@@ -48,6 +59,12 @@ var loyer = this.document.getElementById("loyer");
 var plusDistance = this.document.getElementById("distance-plus");
 var minusDistance = this.document.getElementById("distance-minus");
 var distance = this.document.getElementById("distance");
+var plusSchool = this.document.getElementById("school-plus");
+var minusSchool = this.document.getElementById("school-minus");
+var school = this.document.getElementById("school");
+var plusSocial = this.document.getElementById("social-plus");
+var minusSocial = this.document.getElementById("social-minus");
+var social = this.document.getElementById("social");
 
 const COLOR = 'aqua';
 
@@ -198,6 +215,56 @@ phase5To6.onclick = function() {
         phase6.style.display = "block";
         animateCSS(phase6, "fadeInRight");
     })
+}
+
+phase6To7.onclick = function() {
+    animateCSS(phase6, "fadeOutLeft", function() {
+        phase6.style.display = "none";
+        phase7.style.display = "block";
+        
+        school.innerHTML = school_quality[2];
+
+        animateCSS(phase7, "fadeInRight");
+    })
+}
+
+phase7to8.onclick = function() {
+    animateCSS(phase7, "fadeOutLeft", function() {
+        phase7.style.display = "none";
+        phase8.style.display = "block";
+        
+        social.innerHTML = social_quality[2];
+
+        animateCSS(phase8, "fadeInRight");
+    })
+}
+
+phase8to9.onclick = function() {
+    animateCSS(phase8, "fadeOutLeft", function() {
+        phase8.style.display = "none";
+        phase9.style.display = "block";
+        animateCSS(phase9, "fadeInRight");
+    })
+}
+
+plusSocial.onclick = function() {
+    data.social = Math.min(3, data.social + 1);
+    social.innerHTML = social_quality[data.social];
+}
+
+minusSocial.onclick = function() {
+    data.social = Math.max(0, data.social - 1);
+    social.innerHTML = social_quality[data.social];
+}
+
+plusSchool.onclick = function() {
+    data.school = Math.min(3, data.school + 1);
+    school.innerHTML = school_quality[data.school];
+}
+
+minusSchool.onclick = function() {
+    data.school = Math.max(0, data.school - 1);
+    school.innerHTML = school_quality[data.school];
 }
 
 plusRevenus.onclick = function() {
