@@ -21,7 +21,8 @@ const videoHeight = 200;
 let data = {
     age : 23,
     revenus : 0,
-    loyer: 0
+    loyer: 0,
+    distance: 10
 };
 
 var phase1 = this.document.getElementById("phase1");
@@ -29,6 +30,7 @@ var phase2 = this.document.getElementById("phase2");
 var phase3 = this.document.getElementById("phase3");
 var phase4 = this.document.getElementById("phase4");
 var phase5 = this.document.getElementById("phase5");
+var phase6 = this.document.getElementById("phase6");
 var phase3To4 = this.document.getElementById("phase-3-to-4");
 var phase4To5 = this.document.getElementById("phase-4-to-5");
 var phase5To6 = this.document.getElementById("phase-5-to-6");
@@ -43,6 +45,9 @@ var revenus = this.document.getElementById("revenus");
 var plusLoyer = this.document.getElementById("loyer-plus");
 var minusLoyer = this.document.getElementById("loyer-minus");
 var loyer = this.document.getElementById("loyer");
+var plusDistance = this.document.getElementById("distance-plus");
+var minusDistance = this.document.getElementById("distance-minus");
+var distance = this.document.getElementById("distance");
 
 const COLOR = 'aqua';
 
@@ -187,6 +192,14 @@ phase4To5.onclick = function() {
     })
 }
 
+phase5To6.onclick = function() {
+    animateCSS(phase5, "fadeOutLeft", function() {
+        phase5.style.display = "none";
+        phase6.style.display = "block";
+        animateCSS(phase6, "fadeInRight");
+    })
+}
+
 plusRevenus.onclick = function() {
     data.revenus = parseInt(revenus.innerHTML) + 100;
     revenus.innerHTML = data.revenus;
@@ -213,6 +226,16 @@ minusLoyer.onclick = function() {
     loyer.innerHTML = data.loyer;
     loyer.classList.remove("animated", "pulse")
     loyer.classList.add("animated", "pulse")
+}
+
+plusDistance.onclick = function() {
+    data.distance = parseInt(distance.innerHTML) + 5;
+    distance.innerHTML = data.distance;
+}
+
+minusDistance.onclick = function() {
+    data.distance = Math.max(0, parseInt(distance.innerHTML) - 5);
+    distance.innerHTML = data.distance;
 }
 
 plusAge.onclick = function() {

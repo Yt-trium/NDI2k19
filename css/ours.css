@@ -53,13 +53,13 @@ body {
 
 .big-number-desc
 {
-    display: block;
-    font-size: 10em;
-    font-weight: 900;
-    z-index: 1;
-    opacity: .2;
-    top: 30%;
-    right: 25%;
+    font-size: 8em;
+font-weight: 900;
+z-index: 1;
+opacity: .2;
+top: 30%;
+right: 20%;
+position: absolute;
     position: absolute;
 }
 .big-number 
@@ -87,6 +87,7 @@ bottom: 0;
 height: 200px;
 width: 80px;
 display: block;
+z-index: 200;
 }
 
 .big-number-plus
@@ -103,6 +104,7 @@ bottom: 0;
 height: 200px;
 width: 80px;
 display: block;
+z-index: 200;
 
 }
 
