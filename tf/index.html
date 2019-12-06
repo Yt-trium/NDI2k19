@@ -4,10 +4,14 @@
  	<head>
  		<title>TF</title>
 		<meta charset="UTF-8">
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
- 		<script type="module" src="tf.js"> </script>
+    <script src="https://unpkg.com/@tensorflow/tfjs"></script>
+    <script src="https://unpkg.com/@tensorflow-models/mobilenet"></script>
+    <!--
+      <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+    --!>
  	</head>
  	<body>
-
+    <video autoplay playsinline muted id="webcam" width="178" height="218"></video>
+ 		<script src="tf.js"> </script>
  	</body>
  </html>
