@@ -7,6 +7,12 @@
 
   Desolé pour la salété du code et le manque de commentaires, c'était clairement pas notre priorité.
 
+  Fonctionnalitées :
+  - Calcul d'un profil avec ThreeJs en se basant sur les données du profil de l'utilisateur
+  - Détection du visage sur webcam grace a TensorFlow
+  - Placement d'un visage 3D dans l'application avec ThreeJS + TensorFlow
+  - Détéction de la rotation du visage via une image (voir animate() and ours.js)
+
   Fonts:
   - Roboto
 
@@ -26,7 +32,6 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="css/animate.css">
     <link rel="stylesheet" href="css/ours.css">
-    <script src="js/ours.js"></script>
 
     <title>Strasboug aime ses étudiants</title>
   </head>
@@ -45,7 +50,7 @@
     
     <div id="phase2" class="phase" style="display: none;">
     <p class="big_title right">
-        Notre application a besoin <br/>d'accéder à votre caméra.
+        Notre application a besoin <br/>d'accéder à votre caméra.<br/>Détéction du visage en cours.
         <br/>
         <button style="display: none" id="startButton" type="button" class="big_button btn btn-outline-light">Démarrer l'expérience</button>
     </p>
@@ -103,7 +108,7 @@
 
     <div id="phase9" class="phase" style="display:none">
     <img src="img/giphy.gif">
-    <p>Votre profil a bien été recçu, notre IA va l'analyser et déterminera comment nous pourons vous aider.</p>
+    <p>Votre profil a bien été reçu, notre IA va l'analyser et <br />déterminera comment nous pourons vous aider.</p>
     <p>En attendant, voici quelques aides qui pourraient améliorer votre situation: </p>
     <p><a class="btn btn-outline-light" href="http://www.caf.fr/">Aides sociales</a></p>
     <a class="btn btn-outline-light" href="www.crous-strasbourg.fr">Brouses étudiantes dans votre ville</a>
@@ -111,9 +116,14 @@
   
 
   <video id="video" style="-moz-transform:scaleX(-1);-o-transform:scaleX(-1);-webkit-transform:scaleX(-1);transform:scaleX(-1);display:none"></video>
+   <div id="loader" style="display: none;"></div> 
     <canvas id="output" style="display:none"></canvas>
       
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
+    <script src="js/three.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/OBJLoader.js"></script>
+    <script src="js/ours.js"></script>
   </body>
 </html>
