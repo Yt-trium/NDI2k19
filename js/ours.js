@@ -344,7 +344,7 @@ scene.add(directionalLight);
 var loader = new THREE.OBJLoader();
 let mask;
 loader.load(
-    '../obj/male_crop_head.obj',
+    'male_crop_head.obj',
     function ( object ) {
         mask = object;
         scene.add( object );
