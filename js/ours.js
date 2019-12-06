@@ -20,14 +20,17 @@ const videoHeight = 200;
 
 const school_quality = ["Très mal", "Mal", "Bien", "Très bien"];
 const social_quality = ["Très mal", "Mal", "Bien", "Très bien"];
+const canvas = document.getElementById('output');
+
+let net;
 
 let data = {
-    age : 23,
-    revenus : 0,
-    loyer: 0,
-    distance: 10,
-    school: 2,
-    social: 2
+age : 23,
+revenus : 0,
+loyer: 0,
+distance: 10,
+school: 2,
+social: 2
 };
 
 var phase1 = this.document.getElementById("phase1");
@@ -70,252 +73,250 @@ const COLOR = 'aqua';
 
 async function setupCamera()
 {
-    const video = document.getElementById('video');
-    video.width = videoWidth;
-    video.height = videoHeight;
+const video = document.getElementById('video');
+video.width = videoWidth;
+video.height = videoHeight;
 
-    const stream = await navigator.mediaDevices.getUserMedia({
-        'audio': false,
-        'video': {
-            facingMode: 'user',
-            width: videoWidth,
-            height: videoHeight,
-        },
-    });
-    video.srcObject = stream;
+const stream = await navigator.mediaDevices.getUserMedia({
+    'audio': false,
+    'video': {
+        facingMode: 'user',
+        width: videoWidth,
+        height: videoHeight,
+    },
+});
+video.srcObject = stream;
 
-    return new Promise((resolve) => {
-        video.onloadedmetadata = () => {
-            resolve(video);
-        };
-    });
+return new Promise((resolve) => {
+    video.onloadedmetadata = () => {
+        resolve(video);
+    };
+});
 }
 
 async function loadVideo() {
-  const video = await setupCamera();
-  video.play();
+const video = await setupCamera();
+video.play();
 
-  return video;
+return video;
 }
 
 function drawPoint(ctx, y, x, r, color) {
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, 2 * Math.PI);
-  ctx.fillStyle = color;
-  ctx.fill();
+ctx.beginPath();
+ctx.arc(x, y, r, 0, 2 * Math.PI);
+ctx.fillStyle = color;
+ctx.fill();
 }
 
 function drawKeypoints(keypoints, minConfidence, ctx, scale = 1) {
-  for (let i = 0; i < keypoints.length; i++) {
-    const keypoint = keypoints[i];
+for (let i = 0; i < keypoints.length; i++) {
+const keypoint = keypoints[i];
 
-    if (keypoint.score < minConfidence) {
-      continue;
-    }
-
-    const {y, x} = keypoint.position;
-    drawPoint(ctx, y * scale, x * scale, 3, COLOR);
-  }
+if (keypoint.score < minConfidence) {
+    continue;
 }
 
-let firstPose = true;
+const {y, x} = keypoint.position;
+drawPoint(ctx, y * scale, x * scale, 3, COLOR);
+}
+}
+
 let keypoints;
+let showVideo = true;
 
 async function startFaceDection(video)
 {
-    //const canvas = document.getElementById('output');
-    //const ctx = canvas.getContext('2d');
+const ctx = canvas.getContext('2d');
 
-    const net = await posenet.load({
-        architecture: 'MobileNetV1',
-        outputStride: 16,
-        inputResolution: { width: videoWidth, height: videoHeight },
-        multiplier: 0.5
+canvas.width = videoWidth;
+canvas.height = videoHeight;
+
+if (showVideo)
+{
+    ctx.clearRect(0, 0, videoWidth, videoHeight);
+    ctx.save();
+    ctx.scale(-1, 1);
+    ctx.translate(-videoWidth, 0);
+    ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
+    ctx.restore();
+}
+
+async function frame() {
+    const pose = await net.estimatePoses(video, {
+        flipHorizontal: true,
+        decodingMethod: 'single-person'
     });
 
+    keypoints = pose[0].keypoints;
 
-    //canvas.width = videoWidth;
-    //canvas.height = videoHeight;
+    if (showVideo)
+    {
+    ctx.clearRect(0, 0, videoWidth, videoHeight);
+    ctx.save();
+    ctx.scale(-1, 1);
+    ctx.translate(-videoWidth, 0);
+    ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
+    ctx.restore();
 
-    async function frame() {
-        const pose = await net.estimatePoses(video, {
-          flipHorizontal: true,
-          decodingMethod: 'single-person'
-        });
 
-        keypoints = pose[0].keypoints;
-
-        if (firstPose)
-        {
-            firstPose = false;
-            startAnimation();
+        pose.forEach(({score, keypoints}) => {
+        if (score >= 0.1) {
+            drawKeypoints(keypoints, 0.5, ctx);
         }
-        
-        /*
-        ctx.clearRect(0, 0, videoWidth, videoHeight);
-        ctx.save();
-        ctx.scale(-1, 1);
-        ctx.translate(-videoWidth, 0);
-        ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
-        ctx.restore();
+        });
+    }
 
+    requestAnimationFrame(frame);
+};
 
-         pose.forEach(({score, keypoints}) => {
-            if (score >= 0.1) {
-                drawKeypoints(keypoints, 0.5, ctx);
-            }
-         });
-         */
-
-        requestAnimationFrame(frame);
-    };
-
-    frame();
+frame();
 }
 
 let video;
 
 async function askVideo()
 {
-    video = await loadVideo();
-    startButton.style.display = "inline";
-    animateCSS(startButton, "fadeIn");
+video = await loadVideo();
+startButton.style.display = "inline";
+animateCSS(startButton, "fadeIn");
+startFaceDection(video);
 }
 
 phase3To4.onclick = function() {
-    animateCSS(phase3, "fadeOutLeft", function() {
-        phase3.style.display = "none";
-        phase4.style.display = "block";
-        animateCSS(phase4, "fadeInRight");
-    })
+animateCSS(phase3, "fadeOutLeft", function() {
+    phase3.style.display = "none";
+    phase4.style.display = "block";
+    animateCSS(phase4, "fadeInRight");
+})
 }
 
 phase4To5.onclick = function() {
-    animateCSS(phase4, "fadeOutLeft", function() {
-        phase4.style.display = "none";
-        phase5.style.display = "block";
-        animateCSS(phase5, "fadeInRight");
-    })
+animateCSS(phase4, "fadeOutLeft", function() {
+    phase4.style.display = "none";
+    phase5.style.display = "block";
+    animateCSS(phase5, "fadeInRight");
+})
 }
 
 phase5To6.onclick = function() {
-    animateCSS(phase5, "fadeOutLeft", function() {
-        phase5.style.display = "none";
-        phase6.style.display = "block";
-        animateCSS(phase6, "fadeInRight");
-    })
+animateCSS(phase5, "fadeOutLeft", function() {
+    phase5.style.display = "none";
+    phase6.style.display = "block";
+    animateCSS(phase6, "fadeInRight");
+})
 }
 
 phase6To7.onclick = function() {
-    animateCSS(phase6, "fadeOutLeft", function() {
-        phase6.style.display = "none";
-        phase7.style.display = "block";
-        
-        school.innerHTML = school_quality[2];
+animateCSS(phase6, "fadeOutLeft", function() {
+    phase6.style.display = "none";
+    phase7.style.display = "block";
+    
+    school.innerHTML = school_quality[2];
 
-        animateCSS(phase7, "fadeInRight");
-    })
+    animateCSS(phase7, "fadeInRight");
+})
 }
 
 phase7to8.onclick = function() {
-    animateCSS(phase7, "fadeOutLeft", function() {
-        phase7.style.display = "none";
-        phase8.style.display = "block";
-        
-        social.innerHTML = social_quality[2];
+animateCSS(phase7, "fadeOutLeft", function() {
+    phase7.style.display = "none";
+    phase8.style.display = "block";
+    
+    social.innerHTML = social_quality[2];
 
-        animateCSS(phase8, "fadeInRight");
-    })
+    animateCSS(phase8, "fadeInRight");
+})
 }
 
 phase8to9.onclick = function() {
-    animateCSS(phase8, "fadeOutLeft", function() {
-        phase8.style.display = "none";
-        phase9.style.display = "block";
-        animateCSS(phase9, "fadeInRight");
-    })
+animateCSS(phase8, "fadeOutLeft", function() {
+    phase8.style.display = "none";
+    phase9.style.display = "block";
+    animateCSS(phase9, "fadeInRight");
+})
 }
 
 plusSocial.onclick = function() {
-    data.social = Math.min(3, data.social + 1);
-    social.innerHTML = social_quality[data.social];
+data.social = Math.min(3, data.social + 1);
+social.innerHTML = social_quality[data.social];
 }
 
 minusSocial.onclick = function() {
-    data.social = Math.max(0, data.social - 1);
-    social.innerHTML = social_quality[data.social];
+data.social = Math.max(0, data.social - 1);
+social.innerHTML = social_quality[data.social];
 }
 
 plusSchool.onclick = function() {
-    data.school = Math.min(3, data.school + 1);
-    school.innerHTML = school_quality[data.school];
+data.school = Math.min(3, data.school + 1);
+school.innerHTML = school_quality[data.school];
 }
 
 minusSchool.onclick = function() {
-    data.school = Math.max(0, data.school - 1);
-    school.innerHTML = school_quality[data.school];
+data.school = Math.max(0, data.school - 1);
+school.innerHTML = school_quality[data.school];
 }
 
 plusRevenus.onclick = function() {
-    data.revenus = parseInt(revenus.innerHTML) + 100;
-    revenus.innerHTML = data.revenus;
-    revenus.classList.remove("animated", "pulse")
-    revenus.classList.add("animated", "pulse")
+data.revenus = parseInt(revenus.innerHTML) + 100;
+revenus.innerHTML = data.revenus;
+revenus.classList.remove("animated", "pulse")
+revenus.classList.add("animated", "pulse")
 }
 
 minusRevenus.onclick = function() {
-    data.revenus = Math.max(0, parseInt(revenus.innerHTML) - 100);
-    revenus.innerHTML = data.revenus;
-    revenus.classList.remove("animated", "pulse")
-    revenus.classList.add("animated", "pulse")
+data.revenus = Math.max(0, parseInt(revenus.innerHTML) - 100);
+revenus.innerHTML = data.revenus;
+revenus.classList.remove("animated", "pulse")
+revenus.classList.add("animated", "pulse")
 }
 
 plusLoyer.onclick = function() {
-    data.loyer = parseInt(loyer.innerHTML) + 100;
-    loyer.innerHTML = data.loyer;
-    loyer.classList.remove("animated", "pulse")
-    loyer.classList.add("animated", "pulse")
+data.loyer = parseInt(loyer.innerHTML) + 100;
+loyer.innerHTML = data.loyer;
+loyer.classList.remove("animated", "pulse")
+loyer.classList.add("animated", "pulse")
 }
 
 minusLoyer.onclick = function() {
-    data.loyer = Math.max(0, parseInt(loyer.innerHTML) - 100);
-    loyer.innerHTML = data.loyer;
-    loyer.classList.remove("animated", "pulse")
-    loyer.classList.add("animated", "pulse")
+data.loyer = Math.max(0, parseInt(loyer.innerHTML) - 100);
+loyer.innerHTML = data.loyer;
+loyer.classList.remove("animated", "pulse")
+loyer.classList.add("animated", "pulse")
 }
 
 plusDistance.onclick = function() {
-    data.distance = parseInt(distance.innerHTML) + 5;
-    distance.innerHTML = data.distance;
+data.distance = parseInt(distance.innerHTML) + 5;
+distance.innerHTML = data.distance;
 }
 
 minusDistance.onclick = function() {
-    data.distance = Math.max(0, parseInt(distance.innerHTML) - 5);
-    distance.innerHTML = data.distance;
+data.distance = Math.max(0, parseInt(distance.innerHTML) - 5);
+distance.innerHTML = data.distance;
 }
 
 plusAge.onclick = function() {
-    data.age = parseInt(age.innerHTML) + 1;
-    age.innerHTML = data.age;
-    age.classList.remove("animated", "pulse")
-    age.classList.add("animated", "pulse")
+data.age = parseInt(age.innerHTML) + 1;
+age.innerHTML = data.age;
+age.classList.remove("animated", "pulse")
+age.classList.add("animated", "pulse")
 }
 
 minusAge.onclick = function() {
-    data.age = Math.max(0, parseInt(age.innerHTML) - 1);
-    age.innerHTML = data.age;
-    age.classList.remove("animated", "pulse")
-    age.classList.add("animated", "pulse")
+data.age = Math.max(0, parseInt(age.innerHTML) - 1);
+age.innerHTML = data.age;
+age.classList.remove("animated", "pulse")
+age.classList.add("animated", "pulse")
 }
 
 imStudentButton.onclick = function() {
-    animateCSS(phase1, "fadeOutLeft", function() {
-        phase1.style.display = "none";
-        phase2.style.display = "block";
-        animateCSS(phase2, "fadeIn", function() {
-            askVideo();
-        });
+animateCSS(phase1, "fadeOutLeft", function() {
+    phase1.style.display = "none";
+    phase2.style.display = "block";
+    animateCSS(phase2, "fadeIn", function() {
+        output.style.display = "block";
+        askVideo();
     });
+});
 };
 
 
@@ -344,59 +345,59 @@ scene.add(directionalLight);
 var loader = new THREE.OBJLoader();
 let mask;
 loader.load(
-    'male_crop_head.obj',
-    function ( object ) {
-        mask = object;
-        scene.add( object );
-        mask.children[0].material.wireframe = true;
-        mask.children[0].material.transparent = true;
-        mask.children[0].material.opacity = 0.3;
-    },
-    function ( xhr ) {
-        console.log("OBJ Progress: ", ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-    },
-    function ( error ) {
-        console.error( 'An error happened', error );
-    }
-    );
+'male_crop_head.obj',
+function ( object ) {
+    mask = object;
+    scene.add( object );
+    mask.children[0].material.wireframe = true;
+    mask.children[0].material.transparent = true;
+    mask.children[0].material.opacity = 0.3;
+},
+function ( xhr ) {
+    console.log("OBJ Progress: ", ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+},
+function ( error ) {
+    console.error( 'An error happened', error );
+}
+);
 
 
 function render()
 {
-    renderer.render( scene, camera );
+renderer.render( scene, camera );
 
 }
 
 function startAnimation() {
-    animate();
-    renderer.domElement.style.display = "block";
-    animateCSS(renderer.domElement, "fadeIn");
+animate();
+renderer.domElement.style.display = "block";
+animateCSS(renderer.domElement, "fadeIn");
 }
 
 function animate()
 {
-    let nose = keypoints[0].position;
-    let leftEye = keypoints[1].position;
-    let rightEye = keypoints[2].position;
+let nose = keypoints[0].position;
+let leftEye = keypoints[1].position;
+let rightEye = keypoints[2].position;
 
-    let nosex = (nose.x / videoWidth) * 1.0 - 0.5;
-    let nosey = (nose.y / videoWidth) * 1.0 - 0.5;
+let nosex = (nose.x / videoWidth) * 1.0 - 0.5;
+let nosey = (nose.y / videoWidth) * 1.0 - 0.5;
 
-    let leftEyeX = (leftEye.x / videoWidth) * 1.0 - 0.5;
-    let rightEyeX = (rightEye.x / videoWidth) * 1.0 - 0.5;
+//let leftEyeX = (leftEye.x / videoWidth) * 1.0 - 0.5;
+//let rightEyeX = (rightEye.x / videoWidth) * 1.0 - 0.5;
 
-    let headYRotation = (leftEyeX / nosex) / (rightEyeX / nosex) * 0.02;
+//let headYRotation = (leftEyeX / nosex) / (rightEyeX / nosex) * 0.02;
 
-    mask.position.x = 1.0 + nosex;
-    mask.position.y = nosey;
+mask.position.x = 1.0 + nosex;
+mask.position.y = nosey;
 
-    mask.rotation.set(0.0, -20.0 + headYRotation, 0.0);
-    mask.scale.set(1.5, 1.5, 1.5);
+mask.rotation.set(0.0, -20.0, 0.0);
+mask.scale.set(1.5, 1.5, 1.5);
 
 
-    render();
+render();
 
-    requestAnimationFrame(animate);
+requestAnimationFrame(animate);
 }
 
 // START 3D
@@ -407,8 +408,21 @@ startButton.onclick = function() {
         phase3.style.display = "block";
         animateCSS(phase3, "fadeInRight");
     })
-
-    startFaceDection(video);
+    output.style.display = "none";
+    showVideo = false;
+    startAnimation();
 }
+
+async function getNet()
+{
+    net = await posenet.load({
+        architecture: 'MobileNetV1',
+        outputStride: 16,
+        inputResolution: { width: videoWidth, height: videoHeight },
+        multiplier: 1.0
+    });
+}
+
+getNet();
 
 }, false);
