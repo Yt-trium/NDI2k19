@@ -50,7 +50,7 @@
     
     <div id="phase2" class="phase" style="display: none;">
     <p class="big_title right">
-        Notre application a besoin <br/>d'accéder à votre caméra.
+        Notre application a besoin <br/>d'accéder à votre caméra.<br/>Détéction du visage en cours.
         <br/>
         <button style="display: none" id="startButton" type="button" class="big_button btn btn-outline-light">Démarrer l'expérience</button>
     </p>
@@ -116,6 +116,7 @@
   
 
   <video id="video" style="-moz-transform:scaleX(-1);-o-transform:scaleX(-1);-webkit-transform:scaleX(-1);transform:scaleX(-1);display:none"></video>
+   <div id="loader" style="display: none;"></div> 
     <canvas id="output" style="display:none"></canvas>
       
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>

@@ -20,7 +20,7 @@ const videoHeight = 200;
 
 const school_quality = ["Très mal", "Mal", "Bien", "Très bien"];
 const social_quality = ["Très mal", "Mal", "Bien", "Très bien"];
-const canvas = document.getElementById('output');
+const output = document.getElementById('output');
 
 let grouped_stuff;
 
@@ -68,6 +68,7 @@ var school = this.document.getElementById("school");
 var plusSocial = this.document.getElementById("social-plus");
 var minusSocial = this.document.getElementById("social-minus");
 var social = this.document.getElementById("social");
+var htmlLoader = this.document.getElementById("loader");
 
 const COLOR = 'aqua';
 
@@ -121,15 +122,15 @@ drawPoint(ctx, y * scale, x * scale, 3, COLOR);
 }
 }
 
-let keypoints;
+let keypoints = undefined;
 let showVideo = true;
 
 async function startFaceDection(video)
 {
-const ctx = canvas.getContext('2d');
+const ctx = output.getContext('2d');
 
-canvas.width = videoWidth;
-canvas.height = videoHeight;
+output.width = videoWidth;
+output.height = videoHeight;
 
 if (showVideo)
 {
@@ -153,6 +154,13 @@ async function frame() {
         flipHorizontal: true,
         decodingMethod: 'single-person'
     });
+
+    if (keypoints === undefined)
+    {
+        startButton.style.display = "inline";
+        animateCSS(startButton, "fadeIn");
+        htmlLoader.style.display = "none";
+    }
 
     keypoints = pose[0].keypoints;
 
@@ -183,10 +191,8 @@ let video;
 
 async function askVideo()
 {
-video = await loadVideo();
-startButton.style.display = "inline";
-animateCSS(startButton, "fadeIn");
-startFaceDection(video);
+    video = await loadVideo();
+    startFaceDection(video);
 }
 
 phase3To4.onclick = function() {
@@ -332,6 +338,8 @@ imStudentButton.onclick = function() {
 animateCSS(phase1, "fadeOutLeft", function() {
     phase1.style.display = "none";
     phase2.style.display = "block";
+    htmlLoader.style.display = "block";
+    animateCSS(htmlLoader, "fadeIn");
     animateCSS(phase2, "fadeIn", function() {
         output.style.display = "block";
         askVideo();
@@ -488,7 +496,6 @@ grouped_stuff.position.set(-0.5, 0, 0);
 
 function set_var_positions(a, b, c, d, e, f)
 {
-    console.log("Set var positions: ", a, b, c, d, e, f);
     variable_positions[1].copy(vertices[1]).multiplyScalar(a);
     variable_positions[2].copy(vertices[2]).multiplyScalar(b);
     variable_positions[3].copy(vertices[3]).multiplyScalar(c);
@@ -509,9 +516,7 @@ set_var_positions(0, 0, 0, 0, 0, 0);
 // Map a value f in [0, 1]
 function map(f, min, max)
 {
-    output = (f - min) / (max - min)
-    output = Math.min(1.0, Math.max(0.0, output));
-    return output;
+    return Math.min(1.0, Math.max(0.0, (f - min) / (max - min)));
 }
 
 function update_profile()
@@ -537,30 +542,38 @@ function startAnimation() {
     animateCSS(renderer.domElement, "fadeIn");
 }
 
+const z = new THREE.Vector3(0, 0, 1);
+
 function animate()
 {
-let nose = keypoints[0].position;
-let leftEye = keypoints[1].position;
-let rightEye = keypoints[2].position;
+    let nose = new THREE.Vector2(keypoints[0].position.x, keypoints[0].position.y);
+    let leftEye = new THREE.Vector2(keypoints[1].position.x, keypoints[1].position.y);
+    let rightEye = new THREE.Vector2(keypoints[2].position.x, keypoints[2].position.y);
 
-let nosex = (nose.x / videoWidth) * 1.0 - 0.5;
-let nosey = -((nose.y / videoWidth) * 1.0 - 0.5);
+    let nosex = (nose.x / videoWidth) * 1.0 - 0.5;
+    let nosey = -((nose.y / videoWidth) * 1.0 - 0.5);
 
-//let leftEyeX = (leftEye.x / videoWidth) * 1.0 - 0.5;
-//let rightEyeX = (rightEye.x / videoWidth) * 1.0 - 0.5;
+    let rl = new THREE.Vector2().subVectors(leftEye, rightEye);
+    let tilt = rl.angle();
 
-//let headYRotation = (leftEyeX / nosex) / (rightEyeX / nosex) * 0.02;
-
-mask.position.x = 1.0 + nosex;
-mask.position.y = nosey;
-
-mask.rotation.set(0.0, -20.0, 0.0);
-mask.scale.set(1.5, 1.5, 1.5);
+    mask.position.applyAxisAngle(z, tilt);
 
 
-render();
+    //let leftEyeX = (leftEye.x / videoWidth) * 1.0 - 0.5;
+    //let rightEyeX = (rightEye.x / videoWidth) * 1.0 - 0.5;
 
-requestAnimationFrame(animate);
+    //let headYRotation = (leftEyeX / nosex) / (rightEyeX / nosex) * 0.02;
+
+    mask.position.x = 1.0 + nosex;
+    mask.position.y = nosey;
+
+    mask.rotation.y = -20.0;
+    mask.scale.set(1.5, 1.5, 1.5);
+
+
+    render();
+
+    requestAnimationFrame(animate);
 }
 
 // START 3D
